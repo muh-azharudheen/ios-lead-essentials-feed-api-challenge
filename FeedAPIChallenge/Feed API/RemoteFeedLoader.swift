@@ -26,9 +26,8 @@ public final class RemoteFeedLoader: FeedLoader {
 					completion(result)
 				}
 			case let .success((data, response)):
-				if let result = self?.feedLoaderResult(for: data, response: response) {
-					completion(result)
-				}
+				guard let result = self?.feedLoaderResult(for: data, response: response) else { return }
+				completion(result)
 			}
 		}
 	}
@@ -39,13 +38,13 @@ public final class RemoteFeedLoader: FeedLoader {
 		return .failure(RemoteFeedLoader.Error.connectivity)
 	}
 
-	func feedLoaderResult(for data: Data, response: HTTPURLResponse) -> FeedLoader.Result? {
+	func feedLoaderResult(for data: Data, response: HTTPURLResponse) -> FeedLoader.Result {
 		guard response.statusCode == 200 else {
 			return .failure(RemoteFeedLoader.Error.invalidData)
 		}
 		guard data != Data("invalid json".utf8) else {
 			return .failure(RemoteFeedLoader.Error.invalidData)
 		}
-		return nil
+		return .failure(RemoteFeedLoader.Error.invalidData)
 	}
 }
