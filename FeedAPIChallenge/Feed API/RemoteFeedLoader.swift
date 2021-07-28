@@ -26,7 +26,10 @@ public final class RemoteFeedLoader: FeedLoader {
 				if nsError.domain == "Test" && nsError.code == 0 {
 					completion(.failure(RemoteFeedLoader.Error.connectivity))
 				}
-			default: ()
+			case .success((_, let httpUrlResponse)):
+				if httpUrlResponse.statusCode != 200 {
+					completion(.failure(RemoteFeedLoader.Error.invalidData))
+				}
 			}
 		}
 	}
