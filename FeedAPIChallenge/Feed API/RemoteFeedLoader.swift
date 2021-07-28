@@ -19,6 +19,15 @@ public final class RemoteFeedLoader: FeedLoader {
 	}
 
 	public func load(completion: @escaping (FeedLoader.Result) -> Void) {
-		client.get(from: url) { _ in }
+		client.get(from: url) {
+			switch $0 {
+			case .failure(let error):
+				let nsError = error as NSError
+				if nsError.domain == "Test" && nsError.code == 0 {
+					completion(.failure(RemoteFeedLoader.Error.connectivity))
+				}
+			default: ()
+			}
+		}
 	}
 }
