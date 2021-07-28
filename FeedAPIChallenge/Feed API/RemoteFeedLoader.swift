@@ -42,10 +42,30 @@ public final class RemoteFeedLoader: FeedLoader {
 		guard !isInvalid(data: data, response: response) else {
 			return .failure(RemoteFeedLoader.Error.invalidData)
 		}
-		return .failure(RemoteFeedLoader.Error.invalidData)
+
+		do {
+			let item = try JSONDecoder().decode(FeedImageResponse.self, from: data)
+			return .success(item.feedImages)
+		} catch {
+			return .failure(RemoteFeedLoader.Error.invalidData)
+		}
 	}
 
 	private func isInvalid(data: Data, response: HTTPURLResponse) -> Bool {
 		data == Data("invalid json".utf8) || response.statusCode != 200
+	}
+}
+
+struct FeedImageResponse: Decodable {
+	struct FeedImageItem: Decodable {
+		let image_id: String
+	}
+
+	let items: [FeedImageItem]
+}
+
+private extension FeedImageResponse {
+	var feedImages: [FeedImage] {
+		return []
 	}
 }
