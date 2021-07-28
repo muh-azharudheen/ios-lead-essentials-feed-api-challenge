@@ -19,12 +19,11 @@ public final class RemoteFeedLoader: FeedLoader {
 	}
 
 	public func load(completion: @escaping (FeedLoader.Result) -> Void) {
-		client.get(from: url) {
+		client.get(from: url) { [weak self] in
 			switch $0 {
 			case .failure(let error):
-				let nsError = error as NSError
-				if nsError.domain == "Test" && nsError.code == 0 {
-					completion(.failure(RemoteFeedLoader.Error.connectivity))
+				if let result = self?.feedLoaderResult(for: error as NSError) {
+					completion(result)
 				}
 			case .success((let data, let httpUrlResponse)):
 				if httpUrlResponse.statusCode != 200 {
@@ -34,5 +33,11 @@ public final class RemoteFeedLoader: FeedLoader {
 				}
 			}
 		}
+	}
+	
+	// Helper
+	func feedLoaderResult(for error: NSError) -> FeedLoader.Result? {
+		guard error == NSError(domain: "Test", code: 0) else { return  nil }
+		return .failure(RemoteFeedLoader.Error.connectivity)
 	}
 }
