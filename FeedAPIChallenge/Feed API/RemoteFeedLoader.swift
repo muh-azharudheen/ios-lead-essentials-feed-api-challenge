@@ -33,18 +33,19 @@ public final class RemoteFeedLoader: FeedLoader {
 	}
 
 	// Helper
-	func feedLoaderResult(for error: NSError) -> FeedLoader.Result? {
+	private func feedLoaderResult(for error: NSError) -> FeedLoader.Result? {
 		guard error == NSError(domain: "Test", code: 0) else { return nil }
 		return .failure(RemoteFeedLoader.Error.connectivity)
 	}
 
-	func feedLoaderResult(for data: Data, response: HTTPURLResponse) -> FeedLoader.Result {
-		guard response.statusCode == 200 else {
-			return .failure(RemoteFeedLoader.Error.invalidData)
-		}
-		guard data != Data("invalid json".utf8) else {
+	private func feedLoaderResult(for data: Data, response: HTTPURLResponse) -> FeedLoader.Result {
+		guard !isInvalid(data: data, response: response) else {
 			return .failure(RemoteFeedLoader.Error.invalidData)
 		}
 		return .failure(RemoteFeedLoader.Error.invalidData)
+	}
+
+	private func isInvalid(data: Data, response: HTTPURLResponse) -> Bool {
+		data == Data("invalid json".utf8) || response.statusCode != 200
 	}
 }
