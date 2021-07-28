@@ -56,7 +56,7 @@ public final class RemoteFeedLoader: FeedLoader {
 	}
 }
 
-struct FeedImageResponse: Decodable {
+private struct FeedImageResponse: Decodable {
 	struct FeedImageItem: Decodable {
 		let image_id: UUID
 		let image_desc: String?
