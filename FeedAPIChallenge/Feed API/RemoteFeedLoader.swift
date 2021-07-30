@@ -21,10 +21,8 @@ public final class RemoteFeedLoader: FeedLoader {
 	public func load(completion: @escaping (FeedLoader.Result) -> Void) {
 		client.get(from: url) { [weak self] in
 			switch $0 {
-			case let .failure(error):
-				if let result = self?.feedLoaderResult(for: error as NSError) {
-					completion(result)
-				}
+			case .failure:
+				completion(.failure(RemoteFeedLoader.Error.connectivity))
 			case let .success((data, response)):
 				guard let result = self?.feedLoaderResult(for: data, response: response) else { return }
 				completion(result)
@@ -33,10 +31,6 @@ public final class RemoteFeedLoader: FeedLoader {
 	}
 
 	// Helper
-	private func feedLoaderResult(for error: NSError) -> FeedLoader.Result? {
-		guard error == NSError(domain: "Test", code: 0) else { return nil }
-		return .failure(RemoteFeedLoader.Error.connectivity)
-	}
 
 	private func feedLoaderResult(for data: Data, response: HTTPURLResponse) -> FeedLoader.Result {
 		guard !isInvalid(data: data, response: response) else {
