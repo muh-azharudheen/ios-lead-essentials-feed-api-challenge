@@ -33,7 +33,7 @@ public final class RemoteFeedLoader: FeedLoader {
 	// Helper
 
 	private func feedLoaderResult(for data: Data, response: HTTPURLResponse) -> FeedLoader.Result {
-		guard !isInvalid(data: data, response: response) else {
+		guard response.statusCode == 200 else {
 			return .failure(RemoteFeedLoader.Error.invalidData)
 		}
 
@@ -43,10 +43,6 @@ public final class RemoteFeedLoader: FeedLoader {
 		} catch {
 			return .failure(RemoteFeedLoader.Error.invalidData)
 		}
-	}
-
-	private func isInvalid(data: Data, response: HTTPURLResponse) -> Bool {
-		data == Data("invalid json".utf8) || response.statusCode != 200
 	}
 }
 
