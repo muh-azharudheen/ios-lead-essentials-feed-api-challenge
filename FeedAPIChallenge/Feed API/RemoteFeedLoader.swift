@@ -33,16 +33,10 @@ public final class RemoteFeedLoader: FeedLoader {
 	// Helper
 
 	private func feedLoaderResult(for data: Data, response: HTTPURLResponse) -> FeedLoader.Result {
-		guard response.statusCode == 200 else {
-			return .failure(RemoteFeedLoader.Error.invalidData)
+		guard response.statusCode == 200, let item = try? JSONDecoder().decode(FeedImageResponse.self, from: data) else {
+			return .failure(Error.invalidData)
 		}
-
-		do {
-			let item = try JSONDecoder().decode(FeedImageResponse.self, from: data)
-			return .success(item.feedImages)
-		} catch {
-			return .failure(RemoteFeedLoader.Error.invalidData)
-		}
+		return .success(item.feedImages)
 	}
 }
 
